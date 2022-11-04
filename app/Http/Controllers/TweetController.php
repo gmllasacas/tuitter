@@ -2,18 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Interfaces\TweetRepositoryInterface;
+use App\Http\Requests\StoreTweetRequest;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
+use App\Http\Resources\TweetResource;
+use App\Http\Resources\TweetCollection;
 
 class TweetController extends Controller
 {
+    private TweetRepositoryInterface $tweetRepository;
+
+    public function __construct(TweetRepositoryInterface $tweetRepository)
+    {
+        $this->tweetRepository = $tweetRepository;
+    }
+
     /**
-     * Display a listing of the resource.
+     * Display the create tweet form
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Support\Facades\View
      */
     public function index()
     {
-        //
+        return view(
+            'tweet'
+        );
     }
 
     /**
@@ -29,56 +44,42 @@ class TweetController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param \Illuminate\Http\Request  $request
      */
-    public function store(Request $request)
+    public function store(StoreTweetRequest $request)
     {
-        //
+        $input = [
+            'user_id' => auth()->user()->id,
+            'body' => strip_tags($request->input('body'))
+        ];
+
+        $data = $this->tweetRepository->createTweet($input);
+
+        if ($request->expectsJson()) {
+            return response()->json(
+                [
+                    'data' => $data
+                ],
+                Response::HTTP_CREATED
+            );
+        } else {
+            return redirect()->route('index', ['id' => auth()->user()->id])->with('message', 'The tweet was posted');
+        }
     }
 
     /**
-     * Display the specified resource.
+     * Display a listing of the resource.
      *
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function feed()
     {
-        //
-    }
+        $following = auth()->user()->following->map->only(['followed_id']);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        $usersId = array_merge(
+            [auth()->user()->id],
+            array_column($following->toArray(), 'followed_id')
+        );
+        return $this->tweetRepository->getUserTweets($usersId);
     }
 }

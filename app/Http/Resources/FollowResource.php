@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class TweetResource extends JsonResource
+class FollowResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,10 +15,10 @@ class TweetResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
-            'user' => new UserResource($this->user),
-            'body' => $this->body,
-            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'user_id' => $this->user_id,
+            'followed_id' => $this->followed_id,
+            'name' => $this->name,
+            'username' => $this->username,
         ];
     }
 }

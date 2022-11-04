@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class TweetCollection extends ResourceCollection
+class FollowCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -15,7 +15,7 @@ class TweetCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'data' => TweetResource::collection($this->collection)
+            'data' => FollowResource::collection($this->collection)
         ];
     }
 }

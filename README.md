@@ -1,24 +1,43 @@
-## About Laravel
+# Twitter clone lite
 
-Laravel 8
-Sanctum
+## Technologies used
 
+- Laravel 8
+- Sanctum
+- Blade
+- Bootstrap 3
 
 ## Install
 
-Create a tuitter database.
+- Clone the current repository
+
+
+- Execute the commands:
 
 ```shell
 cp .env.example .env
 ```
-
 ```shell
 php artisan key:generate --ansi
 ```
+- Create a tuitter database and configure .env with the server variables and then execute the commands:
 
 ```shell
-php artisan migrate
+php artisan migrate:refresh --seed
 ```
+```shell
+compose install
+```
+
+```shell
+php artisan serve
+```
+- Go to the local URL and login with the following credentials:
+```
+    Username: 
+    Password: 
+```
+
 
 ## Done
 
@@ -63,3 +82,8 @@ php artisan migrate
 - Public, User page: Home logo or link at the top of every page.
 - Logged, User page: username at the top of every page.
 - Logged, User page: Log out link at the top of every page.
+
+## TODO
+- Change the ID for the username on the URL handle.
+- Unit and Feature tests
+- Optimize the views

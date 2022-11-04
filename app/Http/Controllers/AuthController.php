@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\RegisterUserRequest;
+use App\Http\Requests\StoreUserRequest;
 use App\Models\User;
+use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\View;
 
 class AuthController extends Controller
 {
@@ -19,10 +21,10 @@ class AuthController extends Controller
     /**
      * Register a new user
      *
-     * @param RegisterUserRequest $request
+     * @param StoreUserRequest $request
      * @return JsonResponse
      */
-    public function register(RegisterUserRequest $request): JsonResponse
+    public function store(StoreUserRequest $request): JsonResponse
     {
         $user = User::create([
             'name' => $request->input('name'),
@@ -33,32 +35,53 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ]);
+        return response()->json(
+            [
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+            ]
+        );
     }
 
     public function login(Request $request)
     {
         if (!Auth::attempt($request->only('username', 'password'))) {
-            return response()->json([
-                'message' => 'Invalid login details'
-            ], 401);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Invalid login details'
+                ], 401);
+            }
+
+            return redirect()->route('login')->withErrors(['Invalid login details']);
         }
 
         $user = User::where('username', $request->input('username'))->firstOrFail();
+        $request->session()->put('user', $user);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ]);
+        if ($request->expectsJson()) {
+            return response()->json([
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+            ]);
+        }
+
+        return redirect()->route('index', ['id' => $user->id]);
+    }
+
+    public function logout(Request $request)
+    {
+        $user = $request->user();
+        if ($user) {
+            $user->tokens()->delete();
+        }
+        Auth::logout();
+        return redirect()->route('login');
     }
 
     public function user(Request $request)
     {
-        return $request->user();
+        return new UserResource($request->user());
     }
 }

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Tweet extends Model
+class Follow extends Model
 {
     use HasFactory;
 
@@ -16,17 +16,26 @@ class Tweet extends Model
      */
     protected $fillable = [
         'user_id',
-        'body',
-        'created_at',
+        'followed_id',
     ];
 
     /**
-     * Return the tweet's user
+     * Return the follow's user
      *
      * @return \App\Models\User
      */
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Return the followed user
+     *
+     * @return \App\Models\User
+     */
+    public function followedUser()
+    {
+        return $this->belongsTo(User::class, 'followed_id', 'id');
     }
 }
