@@ -17,16 +17,17 @@
 ```shell
 cp .env.example .env
 ```
+- Create a tuitter database and configure .env with the server variables and then execute the commands:
+
 ```shell
 php artisan key:generate --ansi
 ```
-- Create a tuitter database and configure .env with the server variables and then execute the commands:
 
 ```shell
 php artisan migrate:refresh --seed
 ```
 ```shell
-compose install
+composer install
 ```
 
 ```shell
@@ -34,8 +35,8 @@ php artisan serve
 ```
 - Go to the local URL and login with the following credentials:
 ```
-    Username: 
-    Password: 
+    Username: admin2022
+    Password: password
 ```
 
 

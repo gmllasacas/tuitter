@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
             ->count(20)
             ->create();
 
+        User::where('id', 1)->update(['username' => 'admin2022']);
+
         $follows = [
             [ 'user_id' => 1, 'followed' => [2,4,5,7,8,9,10,12,13,14,15,18,19,20]],
             [ 'user_id' => 2, 'followed' => [3,4,6,7,9,10,12,13,14,16,17,18]],
